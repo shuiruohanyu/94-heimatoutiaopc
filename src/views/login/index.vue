@@ -93,7 +93,8 @@ export default {
           method: 'post'
         }).then(result => {
           // 成功 之后打印结果
-          console.log(result.data)
+          // 把钥匙放在兜里 也就是把token存于 本地缓存
+          window.localStorage.setItem('user-token', result.data.data.token)
         }).catch(() => {
 
         })
