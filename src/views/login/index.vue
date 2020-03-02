@@ -84,7 +84,19 @@ export default {
       // 第二种方式 promise
       this.$refs.loginForm.validate().then(() => {
         // 如果成功通过 校验就会到达 then
+        // 通过校验之后 应该做什么事 -> 应该调用登录接口 看看手机号是否正常
+        //   this.$axios.get/post/delete/put
+        this.$axios({
+          url: '/authorizations', // 请求地址
+          data: this.loginForm,
+          // data: { ...this.loginForm, checked: null }, // body请求体参数
+          method: 'post'
+        }).then(result => {
+          // 成功 之后打印结果
+          console.log(result.data)
+        }).catch(() => {
 
+        })
       })
     }
   }
