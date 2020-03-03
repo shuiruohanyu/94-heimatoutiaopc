@@ -14,16 +14,16 @@
         <!-- 再次放置一个 row组件  align属性设置垂直对齐方式  justify设置 水平对齐属性-->
         <el-row type='flex' justify="end" align="middle">
           <img :src="userInfo.photo" alt="">
-           <!-- 下拉菜单 -->
-           <el-dropdown trigger='click'>
+           <!-- 下拉菜单 点击菜单项会触发 command事件-->
+           <el-dropdown trigger='click' @command="clickMenu">
                <!-- 显示的内容 -->
                <span>{{ userInfo.name }}</span>
                 <!-- 下拉内容需要做具名插槽dropdown  el-dropdown-menu是专门做下拉的组件 -->
                 <el-dropdown-menu slot="dropdown" >
-                   <!-- 下拉选项 el-dropdown-item 作为下拉选项组件-->
-                    <el-dropdown-item>个人信息</el-dropdown-item>
-                    <el-dropdown-item>git地址</el-dropdown-item>
-                    <el-dropdown-item>退出</el-dropdown-item>
+                   <!-- 下拉选项 el-dropdown-item 作为下拉选项组件  给每一个选项一个command属性-->
+                    <el-dropdown-item command="info">个人信息</el-dropdown-item>
+                    <el-dropdown-item command="git">git地址</el-dropdown-item>
+                    <el-dropdown-item command="lgout">退出</el-dropdown-item>
                 </el-dropdown-menu>
            </el-dropdown>
         </el-row>
@@ -36,6 +36,21 @@ export default {
   data () {
     return {
       userInfo: {} // 用户个人信息
+    }
+  },
+  methods: {
+    clickMenu (command) {
+      // 需要处理三种情况
+      if (command === 'info') {
+        // 点击了个人信息
+      } else if (command === 'git') {
+        // 如果点击了git地址就跳转到git仓库
+        window.location.href = 'https://github.com/shuiruohanyu/94-heimatoutiaopc'
+      } else {
+        // 退出系统 1. 删除token 2. 跳转回登录页
+        window.localStorage.removeItem('user-token') // 删除localstorage中某个选项
+        this.$router.push('/login') // 跳回登录页  编程式导航
+      }
     }
   },
   created () {
