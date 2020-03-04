@@ -20,4 +20,14 @@ axios.interceptors.request.use(function (config) {
   // 失败时执行第二个  axios 是一个支持promise  如果失败了 我们应该直接reject  reject会直接进入到axios的catch中
   return Promise.reject(error)
 })
+
+// 响应拦截器的开发
+axios.interceptors.response.use(function (response) {
+  // 回调函数第一个参数 是响应体
+  // 在拦截器中 需要将数据返回  将数据进行解构
+  return response.data ? response.data : {} // 有的接口 没有任何的响应数据
+  // 成功的时候执行
+}, function () {
+  // 失败的时候执行
+})
 export default axios
