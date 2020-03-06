@@ -36,8 +36,23 @@
                     </el-card>
                 </div>
             </el-tab-pane>
-
         </el-tabs>
+        <!-- 放置一个公共的分页组件 -->
+        <el-row type='flex' justify="center" style='height:80px' align="middle">
+            <!-- 放置分页组件
+              total  总条数
+              current-page 当前页码
+              page-size 每页多少条
+              监听 分页的组件的切换事件
+            -->
+            <el-pagination background
+              :total="page.total"
+              :current-page="page.currentPage"
+              :page-size="page.pageSize"
+              layout="prev, pager, next"
+              @current-change="changePage"
+            ></el-pagination>
+        </el-row>
    </el-card>
 </template>
 
@@ -46,28 +61,46 @@ export default {
   data () {
     return {
       activeName: 'all', // 当前激活的页签 默认选中全部素材
-      list: [] // 全部素材的数据 接收全部素材  和收藏的数据
+      list: [], // 全部素材的数据 接收全部素材  和收藏的数据
+      //  专门的对象存放分页信息
+      page: {
+        currentPage: 1, // 默认第一页
+        total: 0, // 当前总数
+        pageSize: 4 // 每页多少条
+      }
     }
   },
   methods: {
+    //   该方法会在页码切换时执行
+    changePage (newPage) {
+      // 传入一个新页
+      this.page.currentPage = newPage // 将新页码赋值给页码数据
+      this.getMaterial() // 获取数据
+    },
     //   获取素材数据
     getMaterial () {
       this.$axios({
         url: '/user/images', // 请求地址
         params: {
-          collect: this.activeName === 'collect' //  这个位置应该变活 根据当前的页签变活   activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
+          collect: this.activeName === 'collect', //  这个位置应该变活 根据当前的页签变活   activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
+          page: this.page.currentPage, // 取页码变量中的值 因为只要页码变量一变 获取的数据跟着变
+          per_page: this.page.pageSize // 获取每页数量
+
         }, // get参数 也就是query参数
         data: {} // data参数 放的是body参数
       }).then(result => {
         // 将返回的数据 赋值到data中的数据
         this.list = result.data.results
+        // 将总条数赋值给total变量
+        this.page.total = result.data.total_count // 总数  全部素材的总数  收藏素材的总数 总数 跟随 当前页签变化而变化
       })
     },
     // 切换页签事件
     changeTab () {
+      this.page.currentPage = 1 // 将页码重置为第一页 因为分类变了 数据变了
       // 在切换事件中
-    // 可以根据当前 activeName来决定是获取哪个方面 的数据
-    // activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
+      // 可以根据当前 activeName来决定是获取哪个方面 的数据
+      // activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
       this.getMaterial() // 直接调用获取素材的方法
     }
   },
