@@ -24,11 +24,15 @@ export default {
 }
 </script>
 
-<style>
+<style lang='less'>
 .second-home {
   /* calc 计算的意思 在css中计算数值 用法  calc ( 四则运算  ) 变量之间 和运算符之间一定要有空格 */
   height: calc(100vh - 60px);
   background-size: cover;
   background-image: url("http://attach.bbs.miui.com/forum/201111/21/205700txzuacubbcy91u99.jpg");
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>
