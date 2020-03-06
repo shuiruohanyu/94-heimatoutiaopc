@@ -77,7 +77,11 @@ export default {
           method: 'put', // 请求类型
           // query参数
           params: {
-            article_id: row.id // 要求参数的文章id
+            // 为什么评论会失败 就是因为 原来 给你传了 9152 你回传了 9200
+            // 所以我们用大数字包 保证 9152不被转化 就可以使用原来的功能
+            article_id: row.id.toString() // 要求参数的文章id 将 BigNumber类型转化成字符串
+            // 前端传字符串到后端 只要和原数字一致  后端会自动将字符串转成大数字
+            // 只需要保证 id 和传过来的id一致就行
           },
           data: {
             //  body参数
