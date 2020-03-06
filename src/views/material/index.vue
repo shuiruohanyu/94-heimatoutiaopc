@@ -8,6 +8,16 @@
                 素材管理
             </template>
         </bread-crumb>
+        <!-- el-row可以布局 -->
+        <!-- 放置一个上传的组件 -->
+        <el-row type='flex' justify="end">
+          <!-- 上传组件要求必须传action属性 不传就会报错 可以给一个空字符串 show-file-list 是否显示已上传文件列表-->
+          <el-upload :show-file-list="false" :http-request="uploadImg" action="">
+           <el-button size="small" type='primary'>上传素材</el-button>
+           <!-- 传入一个内容 点击内容就会传出上传文件框 -->
+          </el-upload>
+        </el-row>
+
         <!-- 放置标签页 v-model所绑定的值 就是当前所激活的页签 切换tabs页签的时候 需要 进行事件的监听-->
         <el-tabs v-model="activeName" @tab-click="changeTab">
             <!-- 放置标签 label表示标签显示的名称 name代表页签的选中的值-->
@@ -66,11 +76,29 @@ export default {
       page: {
         currentPage: 1, // 默认第一页
         total: 0, // 当前总数
-        pageSize: 4 // 每页多少条
+        pageSize: 16 // 每页多少条
       }
     }
   },
   methods: {
+    // 定义一个上传组件的方法
+    uploadImg (params) {
+      //  params.file 就是需要上传的图片文件
+      // 接口参数类型要求是 formData
+      const data = new FormData() // 实例化一个formData对象
+      data.append('image', params.file) // 加入文件参数
+      // 开始发送上传请求了
+      this.$axios({
+        url: '/user/images', // 请求地址
+        method: 'post', // 上传或者新增一般都是post类型
+        data // es6简写
+      }).then(() => {
+        // 如果成功了 我们应该 重新来取数据啊
+        this.getMaterial()
+      }).catch(() => {
+        this.$message.error('上传素材失败')
+      })
+    },
     //   该方法会在页码切换时执行
     changePage (newPage) {
       // 传入一个新页
