@@ -30,8 +30,9 @@
                         <img :src="item.url" alt="">
                         <!-- 操作栏 可以flex布局-->
                         <el-row class='operate' type='flex' align="middle" justify="space-around">
-                           <i class='el-icon-star-on'></i>
-                           <i class='el-icon-delete-solid'></i>
+                          <!-- 两个图标注册点击事件  根据 数据判断 图标的颜色-->
+                           <i @click="collectOrCancel(item)" :style="{color: item.is_collected ? 'red' : 'black'}" class='el-icon-star-on'></i>
+                           <i @click="delMaterial(item)" class='el-icon-delete-solid'></i>
                         </el-row>
                     </el-card>
                 </div>
@@ -48,7 +49,7 @@
             </el-tab-pane>
         </el-tabs>
         <!-- 放置一个公共的分页组件 -->
-        <el-row type='flex' justify="center" style='height:80px' align="middle">
+        <el-row  type='flex' justify="center" style='height:80px' align="middle">
             <!-- 放置分页组件
               total  总条数
               current-page 当前页码
@@ -81,6 +82,42 @@ export default {
     }
   },
   methods: {
+    // 删除素材的方法
+    delMaterial (row) {
+      //  删除之前 应该友好的问候一下 是不是需要删除 ?
+      // confirm 也是promise
+      this.$confirm('您确定要删除该图片吗?', '提示').then(() => {
+        //  如果 确定删除  直接调用删除接口
+        this.$axios({
+          method: 'delete', // 请求类型 删除
+          url: `/user/images/${row.id}` // 请求地址
+        }).then(() => {
+        //  成功了应该干啥
+          this.getMaterial() // 重新加载数据
+          //  如果删除成功了 可以重新拉取数据 也可以 在前端删除  会在 移动端进行场景演示
+          // C 端场景  如果删除 或者修改数据 不会重新拉取数据 只会在前端修改对应的一条数据
+          // B 端场景 可以拉取数据
+        }).catch(() => {
+          this.$message.error('操作失败')
+        })
+      })
+    },
+    // 取消或者收藏素材
+    collectOrCancel (row) {
+      // 调用收藏和取消收藏接口
+      this.$axios({
+        method: 'put', // 请求类型
+        url: `/user/images/${row.id}`, // 请求地址
+        data: {
+          collect: !row.is_collected // true  or false  ?  取反 因为 收藏 => 取消收藏 没收藏  => 收藏
+        } // 放置body参数
+      }).then(() => {
+        //  成功了应该干啥
+        this.getMaterial() // 重新加载数据
+      }).catch(() => {
+        this.$message.error('操作失败')
+      })
+    },
     // 定义一个上传组件的方法
     uploadImg (params) {
       //  params.file 就是需要上传的图片文件
