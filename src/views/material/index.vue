@@ -25,9 +25,9 @@
                 <!-- 内容 循环生成页面结构 -->
                 <div class='img-list'>
                     <!-- 采用v-for对list数据进行循环 -->
-                    <el-card class='img-card' v-for="item in list" :key="item.id">
+                    <el-card class='img-card' v-for="(item,index) in list" :key="item.id">
                         <!-- 放置图片 并且赋值 图片地址-->
-                        <img :src="item.url" alt="">
+                        <img :src="item.url" alt="" @click="selectImg(index)">
                         <!-- 操作栏 可以flex布局-->
                         <el-row class='operate' type='flex' align="middle" justify="space-around">
                           <!-- 两个图标注册点击事件  根据 数据判断 图标的颜色-->
@@ -41,9 +41,9 @@
                 <!-- 内容 -->
                   <div class='img-list'>
                     <!-- 采用v-for对list数据进行循环 -->
-                    <el-card class='img-card' v-for="item in list" :key="item.id">
+                    <el-card class='img-card' v-for="(item, index) in list" :key="item.id">
                         <!-- 放置图片 并且赋值 图片地址-->
-                        <img :src="item.url" alt="">
+                        <img :src="item.url" alt="" @click="selectImg(index)">
                     </el-card>
                 </div>
             </el-tab-pane>
@@ -64,6 +64,17 @@
               @current-change="changePage"
             ></el-pagination>
         </el-row>
+        <!-- 放置一个el-dialog组件 通过visible 属性进行true false设置 -->
+        <el-dialog @opened="openEnd" :visible="dialogVisible" @close="dialogVisible = false">
+          <!-- 放置一个走马灯组件 -->
+          <el-carousel ref="myCarousel" indicator-position="outside" height="400px">
+             <!-- 放置幻灯片循环项  根据 当前页list 循环-->
+             <el-carousel-item v-for="item in list" :key="item.id">
+                <!-- 放置图片 -->
+                 <img style="width:100%;height:100%" :src="item.url" alt="">
+             </el-carousel-item>
+          </el-carousel>
+        </el-dialog>
    </el-card>
 </template>
 
@@ -78,10 +89,21 @@ export default {
         currentPage: 1, // 默认第一页
         total: 0, // 当前总数
         pageSize: 16 // 每页多少条
-      }
+      },
+      dialogVisible: false, // 控制显示隐藏
+      clickIndex: -1 // 点击的索引
     }
   },
   methods: {
+    openEnd () {
+      // 这个时候已经打开结束 ref已经有值 可以通过ref进行设置了
+      this.$refs.myCarousel.setActiveItem(this.clickIndex) // 尝试通过这种方式设置index
+    },
+    // 点击图片时调用
+    selectImg (index) {
+      this.clickIndex = index // 将索引赋值
+      this.dialogVisible = true // 打开索引
+    },
     // 删除素材的方法
     delMaterial (row) {
       //  删除之前 应该友好的问候一下 是不是需要删除 ?
