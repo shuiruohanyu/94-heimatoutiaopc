@@ -34,8 +34,9 @@
         </el-form-item>
         <el-form-item>
           <!-- 放置两个按钮 -->
-          <el-button @click="publish" type='primary'>发表</el-button>
-          <el-button>存入草稿</el-button>
+          <!-- true和false代表是不是草稿 -->
+          <el-button @click="publish(false)" type='primary'>发表</el-button>
+          <el-button @click="publish(true)">存入草稿</el-button>
         </el-form-item>
 
       </el-form>
@@ -78,9 +79,31 @@ export default {
       })
     },
     // 发布
-    publish () {
+    publish (draft) {
       //  this.$refs 来获取 el-form实例  调用validate方法
-      this.$refs.myForm.validate()
+      // 回调形式
+      // promise形式
+      // this.$refs.myForm.validate(function (isOK) {
+      //   if (isOK) {
+      //     // 调用发布皆苦
+      //   }
+      // })
+      this.$refs.myForm.validate().then(() => {
+        // 如果进了then 表示校验成功
+        // 调用发布接口
+        this.$axios({
+          method: 'post',
+          url: '/articles', // 请求地址
+          params: { draft }, // query参数
+          data: this.publishForm // 请求体body参数
+        }).then(() => {
+          this.$message.success('发布成功!')
+          // 如果发布成功
+          this.$router.push('/home/articles') // 跳到文章列表
+        }).catch(() => {
+          this.$message.error('发布失败!')
+        })
+      })
     }
   },
   created () {
