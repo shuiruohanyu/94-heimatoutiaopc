@@ -24,7 +24,11 @@
         </el-form-item>
         <el-form-item label="频道">
           <!-- select选择器 -->
-          <el-select placeholder="请选择频道"></el-select>
+          <el-select placeholder="请选择频道">
+              <!-- 下拉选项 v-for 循环生成 el-option-->
+              <!-- label 显示值  value 保存值 -->
+              <el-option v-for="item in channels" :label="item.name" :value="item.id"  :key="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
           <!-- 放置两个按钮 -->
@@ -38,7 +42,25 @@
 
 <script>
 export default {
-
+  data () {
+    return {
+      channels: [] // 接收频道数据
+    }
+  },
+  methods: {
+    // 获取频道数据
+    getChannels () {
+      this.$axios({
+        url: '/channels' // 获取频道数据
+      }).then(result => {
+        this.channels = result.data.channels // 将频道数据赋值给本地数据
+      })
+    }
+  },
+  created () {
+    // 调用获取频道数据的方法
+    this.getChannels()
+  }
 }
 </script>
 
