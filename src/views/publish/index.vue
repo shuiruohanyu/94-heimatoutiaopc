@@ -28,6 +28,9 @@
              <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
         </el-form-item>
+        <!-- 放置封面组件 -->
+        <!-- 把封面图片传递给子组件 -->
+        <cover-image @selectTwoImg="receiveImg" :list="publishForm.cover.images"></cover-image>
         <el-form-item label="频道" prop="channel_id">
           <!-- select选择器 -->
           <el-select placeholder="请选择频道" v-model="publishForm.channel_id">
@@ -74,6 +77,15 @@ export default {
     }
   },
   methods: {
+    // 接收cover-image传递过来的数据
+    receiveImg (url, index) {
+      // 接收到了 传递过来的封面数据
+      // 接下来需要更新 images数组
+      // but!!!!  仅仅拿到了一个url地址, 但是images可能有1条 可能有3条 单单有地址 并不足以 知道要更新哪一条记录
+      //  有索引 有 url了 可以改变 数据了
+      this.publishForm.cover.images.splice(index, 1, url) // 删除替换元素
+      // splice(索引, 要删除的个数, 替换的个数)
+    },
     // 改变类型事件
     changeType () {
       //  我们应该根据type的值对 images进行控制
