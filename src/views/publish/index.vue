@@ -85,7 +85,7 @@ export default {
       // 监听$route的变化
       // to表示新的路由地址对象
       // from表示旧的路由地址对象
-      console.log(to) // 打印一下to属性
+    //  console.log(to) // 打印一下to属性
       // 根据to属性中的 params的articleId的变化 来决定 是不是改变数据
       // 如果有articleId  应该获取编辑文章的数据
       // 如果没有articleId 应该将表单数据设置为空
