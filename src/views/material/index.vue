@@ -105,58 +105,59 @@ export default {
       this.dialogVisible = true // 打开索引
     },
     // 删除素材的方法
-    delMaterial (row) {
+    async delMaterial (row) {
       //  删除之前 应该友好的问候一下 是不是需要删除 ?
       // confirm 也是promise
-      this.$confirm('您确定要删除该图片吗?', '提示').then(() => {
+      await this.$confirm('您确定要删除该图片吗?', '提示')
+      try {
         //  如果 确定删除  直接调用删除接口
-        this.$axios({
+        await this.$axios({
           method: 'delete', // 请求类型 删除
           url: `/user/images/${row.id}` // 请求地址
-        }).then(() => {
-        //  成功了应该干啥
-          this.getMaterial() // 重新加载数据
-          //  如果删除成功了 可以重新拉取数据 也可以 在前端删除  会在 移动端进行场景演示
-          // C 端场景  如果删除 或者修改数据 不会重新拉取数据 只会在前端修改对应的一条数据
-          // B 端场景 可以拉取数据
-        }).catch(() => {
-          this.$message.error('操作失败')
         })
-      })
-    },
-    // 取消或者收藏素材
-    collectOrCancel (row) {
-      // 调用收藏和取消收藏接口
-      this.$axios({
-        method: 'put', // 请求类型
-        url: `/user/images/${row.id}`, // 请求地址
-        data: {
-          collect: !row.is_collected // true  or false  ?  取反 因为 收藏 => 取消收藏 没收藏  => 收藏
-        } // 放置body参数
-      }).then(() => {
         //  成功了应该干啥
         this.getMaterial() // 重新加载数据
-      }).catch(() => {
+      //  如果删除成功了 可以重新拉取数据 也可以 在前端删除  会在 移动端进行场景演示
+      // C 端场景  如果删除 或者修改数据 不会重新拉取数据 只会在前端修改对应的一条数据
+      // B 端场景 可以拉取数据
+      } catch (error) {
         this.$message.error('操作失败')
-      })
+      }
+    },
+    // 取消或者收藏素材
+    async collectOrCancel (row) {
+      try {
+        // 调用收藏和取消收藏接口
+        await this.$axios({
+          method: 'put', // 请求类型
+          url: `/user/images/${row.id}`, // 请求地址
+          data: {
+            collect: !row.is_collected // true  or false  ?  取反 因为 收藏 => 取消收藏 没收藏  => 收藏
+          } // 放置body参数
+        })
+        this.getMaterial() // 重新加载数据
+      } catch (error) {
+        this.$message.error('操作失败')
+      }
     },
     // 定义一个上传组件的方法
-    uploadImg (params) {
-      //  params.file 就是需要上传的图片文件
+    async uploadImg (params) {
+      try {
+        //  params.file 就是需要上传的图片文件
       // 接口参数类型要求是 formData
-      const data = new FormData() // 实例化一个formData对象
-      data.append('image', params.file) // 加入文件参数
-      // 开始发送上传请求了
-      this.$axios({
-        url: '/user/images', // 请求地址
-        method: 'post', // 上传或者新增一般都是post类型
-        data // es6简写
-      }).then(() => {
+        const data = new FormData() // 实例化一个formData对象
+        data.append('image', params.file) // 加入文件参数
+        // 开始发送上传请求了
+        await this.$axios({
+          url: '/user/images', // 请求地址
+          method: 'post', // 上传或者新增一般都是post类型
+          data // es6简写
+        })
         // 如果成功了 我们应该 重新来取数据啊
         this.getMaterial()
-      }).catch(() => {
+      } catch (error) {
         this.$message.error('上传素材失败')
-      })
+      }
     },
     //   该方法会在页码切换时执行
     changePage (newPage) {
@@ -165,8 +166,8 @@ export default {
       this.getMaterial() // 获取数据
     },
     //   获取素材数据
-    getMaterial () {
-      this.$axios({
+    async getMaterial () {
+      const result = await this.$axios({
         url: '/user/images', // 请求地址
         params: {
           collect: this.activeName === 'collect', //  这个位置应该变活 根据当前的页签变活   activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
@@ -175,12 +176,11 @@ export default {
 
         }, // get参数 也就是query参数
         data: {} // data参数 放的是body参数
-      }).then(result => {
-        // 将返回的数据 赋值到data中的数据
-        this.list = result.data.results
-        // 将总条数赋值给total变量
-        this.page.total = result.data.total_count // 总数  全部素材的总数  收藏素材的总数 总数 跟随 当前页签变化而变化
       })
+      // 将返回的数据 赋值到data中的数据
+      this.list = result.data.results
+      // 将总条数赋值给total变量
+      this.page.total = result.data.total_count // 总数  全部素材的总数  收藏素材的总数 总数 跟随 当前页签变化而变化
     },
     // 切换页签事件
     changeTab () {

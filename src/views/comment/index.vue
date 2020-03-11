@@ -74,9 +74,9 @@ export default {
       this.getComment() // 获取评论
     },
     //   获取评论数据
-    getComment () {
+    async getComment () {
       this.loading = true // 打开遮罩层
-      this.$axios({
+      const result = await this.$axios({
         url: '/articles', // 请求地址
         // 接口 如果你不传分页数据 默认查第一页的数据
         params: {
@@ -87,13 +87,12 @@ export default {
         // query参数应该在哪个位置传 axios
         // params 传get参数也就是query参数
         // data   传body参数也就是请求体参数
-      }).then(result => {
-        //  将返回结果的中 数组 给list
-        this.list = result.data.results
-        // 在获取完数据之后 将 总数赋值给 total
-        this.page.total = result.data.total_count // 将总数赋值
-        this.loading = false // 请求完毕 关闭遮罩层
       })
+      //  将返回结果的中 数组 给list
+      this.list = result.data.results
+      // 在获取完数据之后 将 总数赋值给 total
+      this.page.total = result.data.total_count // 将总数赋值
+      this.loading = false // 请求完毕 关闭遮罩层
     },
     //  定义一个格式化的函数
     formatterBool (row, column, cellValue, index) {
@@ -105,12 +104,13 @@ export default {
       return cellValue ? '正常' : '关闭'
     },
     //  打开或者关闭逻辑
-    openOrClose (row) {
+    async openOrClose (row) {
       const mess = row.comment_status ? '关闭' : '打开'
       // $confirm 也支持 promise 点击确定会进入到then 点击取消会进入到catch
-      this.$confirm(`是否确定${mess}评论`, '提示').then(() => {
+      await this.$confirm(`是否确定${mess}评论`, '提示')
+      try {
         // 调用打开或者关闭接口
-        this.$axios({
+        await this.$axios({
           url: '/comments/status', // 请求地址
           method: 'put', // 请求类型
           // query参数
@@ -125,16 +125,15 @@ export default {
             //  body参数
             allow_comment: !row.comment_status // 是打开还是关闭  此状态和评论状态相反
           }
-        }).then(() => {
-          //   成功了 提示个消息 然后 重新拉取数据4
-          this.$message.success(`${mess}评论成功`)
-          //  重新拉取数据
-          this.getComment() // 调用重新拉取数据的方法
-        }).catch(() => {
-          //   表示失败了 会进入到catch
-          this.$message.error(`${mess}评论失败`)
         })
-      })
+        //   成功了 提示个消息 然后 重新拉取数据4
+        this.$message.success(`${mess}评论成功`)
+        //  重新拉取数据
+        this.getComment() // 调用重新拉取数据的方法
+      } catch (error) {
+        //   表示失败了 会进入到catch
+        this.$message.error(`${mess}评论失败`)
+      }
     }
   },
   created () {
