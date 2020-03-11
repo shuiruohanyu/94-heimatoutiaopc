@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import eventBus from '@/utils/eventBus' // 公共领域监听
 export default {
   data () {
     return {
@@ -51,15 +52,23 @@ export default {
         window.localStorage.removeItem('user-token') // 删除localstorage中某个选项
         this.$router.push('/login') // 跳回登录页  编程式导航
       }
+    },
+    getUserInfo () {
+      this.$axios({
+        url: '/user/profile' // 请求地址
+      }).then(result => {
+      // 如果加载成功了 我们要将数据赋值给 userInfo
+        this.userInfo = result.data
+      })
     }
   },
   created () {
     //   获取用户的个人信息
-    this.$axios({
-      url: '/user/profile' // 请求地址
-    }).then(result => {
-      // 如果加载成功了 我们要将数据赋值给 userInfo
-      this.userInfo = result.data
+    this.getUserInfo() // 这是正常加载
+    eventBus.$on('updateUser', () => {
+      // 如果有人触发了 updateUser事件 就会进入到该函数
+      // 重新获取下信息即可
+      this.getUserInfo()
     })
   }
 }
