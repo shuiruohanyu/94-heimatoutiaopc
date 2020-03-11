@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import { getMaterial } from '@/api/material'
 export default {
   data () {
     return {
@@ -167,15 +168,10 @@ export default {
     },
     //   获取素材数据
     async getMaterial () {
-      const result = await this.$axios({
-        url: '/user/images', // 请求地址
-        params: {
-          collect: this.activeName === 'collect', //  这个位置应该变活 根据当前的页签变活   activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
-          page: this.page.currentPage, // 取页码变量中的值 因为只要页码变量一变 获取的数据跟着变
-          per_page: this.page.pageSize // 获取每页数量
-
-        }, // get参数 也就是query参数
-        data: {} // data参数 放的是body参数
+      const result = await getMaterial({
+        collect: this.activeName === 'collect', //  这个位置应该变活 根据当前的页签变活   activeName === 'all' 获取所有的素材  activeName = 'collect' 获取收藏素材
+        page: this.page.currentPage, // 取页码变量中的值 因为只要页码变量一变 获取的数据跟着变
+        per_page: this.page.pageSize // 获取每页数量
       })
       // 将返回的数据 赋值到data中的数据
       this.list = result.data.results

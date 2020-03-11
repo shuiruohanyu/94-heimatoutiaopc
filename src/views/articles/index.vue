@@ -88,6 +88,8 @@
 </template>
 
 <script>
+import { getChannels } from '@/api/channels'
+import { getArticles } from '@/api/articles'
 export default {
   data () {
     return {
@@ -201,24 +203,16 @@ export default {
       this.getArticles(params) // 直接调用获取方法
     },
     // 获取频道数据
-    getChannels () {
-      this.$axios({
-        url: '/channels'
-      }).then(result => {
-        // 获取频道接口返回的数据
-        this.channels = result.data.channels
-      })
+    async  getChannels () {
+      const result = await getChannels()
+      this.channels = result.data.channels
     },
     // 获取文章列表
-    getArticles (params) {
-      this.$axios({
-        url: '/articles', // 请求地址
-        params // es6写法
-      }).then(result => {
-        this.list = result.data.results // 获取文章列表
-        // 将总数赋值给total
-        this.page.total = result.data.total_count // 总数
-      })
+    async   getArticles (params) {
+      const result = await getArticles(params)
+      this.list = result.data.results // 获取文章列表
+      // 将总数赋值给total
+      this.page.total = result.data.total_count // 总数
     }
   },
   created () {
